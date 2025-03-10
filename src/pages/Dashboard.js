@@ -94,7 +94,7 @@ function Dashboard() {
         <ClickableDiv onClick={() => handleClick('/')}>Auction App</ClickableDiv>
         <NavLink to="/signup">Signup</NavLink>
         <NavLink to="/signin">Signin</NavLink>
-        <ClickableDiv onClick={() => handleClick('/')}>Dashboard</ClickableDiv>
+        <ClickableDiv onClick={() => handleClick('/dashboard')}>Dashboard</ClickableDiv>
         <NavLink to="/postauction">Post Auction</NavLink>
         <NavLink to="/auctionitem">Auction Items</NavLink>
       </Header>

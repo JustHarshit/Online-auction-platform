@@ -5,6 +5,7 @@ import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
 import Dashboard from './pages/Dashboard';
 import AuctionItem from './pages/AuctionItem';
+import PostAuction from './pages/PostAuction';
 
 function App() {
   return (
@@ -15,7 +16,7 @@ function App() {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/auctionitem" element={<AuctionItem />} />
-        <Route path="/postauction" element={<AuctionItem />} />
+        <Route path="/postauction" element={<PostAuction />} />
       </Routes>
     </Router>
   );
