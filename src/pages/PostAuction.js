@@ -148,18 +148,39 @@ function PostAuction() {
 
     if (isValid) {
       try {
-        const res = await axios.post('http://localhost:5001/auctions', {
-          itemName,
-          description,
-          startingBid,
-        });
-        setMessage(res.data.message);
+        // Get the JWT token from localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No token found');
+        }
+
+        // Make a POST request to /auctions with JWT token
+        /*const response = */await axios.post(
+          'http://localhost:5001/auctions',
+          {
+            itemName,
+            description,
+            startingBid,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setMessage('Auction created successfully!');
         // Reset form
         setItemName('');
         setDescription('');
         setStartingBid('');
+
+        // Redirect to Dashboard
+        navigate('/dashboard');
       } catch (error) {
-        setMessage('Error creating auction: ' + error.response?.data?.message || error.message);
+        setMessage(
+          'Error creating auction: ' + (error.response?.data?.message || error.message)
+        );
         console.error(error);
       }
     }

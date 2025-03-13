@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios'; // Import Axios for API calls
 
 const SignInContainer = styled.div`
   width: 100vw;
@@ -114,12 +115,28 @@ function SignIn() {
     setLoginError('');
     setIsLoading(true);
 
-    // Simulate API call (replace with actual API call later)
-    setTimeout(() => {
-      console.log('Signing in with:', username, password);
+    try {
+      // Send a POST request to /auth/login
+      const response = await axios.post('http://localhost:5001/auth/login', {
+        username,
+        password,
+      });
+
+      // Store the JWT token in localStorage
+      localStorage.setItem('token', response.data.token);
+
+      // Navigate to the Dashboard
       navigate('/dashboard');
+    } catch (error) {
+      // Handle login errors
+      if (error.response && error.response.data && error.response.data.message) {
+        setLoginError(error.response.data.message);
+      } else {
+        setLoginError('An error occurred while trying to sign in.');
+      }
+    } finally {
       setIsLoading(false);
-    }, 1500); // Simulate a 1.5-second delay
+    }
   };
 
   const handleClick = (path) => {

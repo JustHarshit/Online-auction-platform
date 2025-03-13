@@ -1,5 +1,5 @@
 // models/Auction.js
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const auctionSchema = new mongoose.Schema({
     itemName: {
@@ -24,4 +24,6 @@ const auctionSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('Auction', auctionSchema);
+const Auction = mongoose.model('Auction', auctionSchema);
+
+export default Auction;

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import axios from 'axios'; // Import Axios for API calls
 
 const SignInFormContainer = styled.div`
   text-align: center;
@@ -32,6 +33,7 @@ const SignInButton = styled.button`
   width: 100%;
   &:hover {
     background-color: #6a00ff;
+    opacity: 0.9; /* Slight hover effect */
   }
   margin-top: 0.625em;
 `;
@@ -42,18 +44,22 @@ const ErrorMessage = styled.div`
   margin-top: 0.3125em;
 `;
 
-function SignInForm({ onSubmit }) {
+function SignInForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [usernameError, setUsernameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [serverError, setServerError] = useState(''); // For backend error messages
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setUsernameError('');
     setPasswordError('');
+    setServerError('');
 
     let isValid = true;
+
+    // Frontend validation
     if (!username) {
       setUsernameError('Username is required');
       isValid = false;
@@ -64,7 +70,26 @@ function SignInForm({ onSubmit }) {
     }
 
     if (isValid) {
-      onSubmit({ username, password });
+      try {
+        // Send a POST request to /auth/login
+        const response = await axios.post('http://localhost:5001/auth/login', {
+          username,
+          password,
+        });
+
+        // Save the JWT token in localStorage
+        localStorage.setItem('token', response.data.token);
+
+        // Redirect to Dashboard
+        window.location.href = '/dashboard';
+      } catch (err) {
+        // Handle server errors (e.g., invalid credentials)
+        if (err.response && err.response.data.message) {
+          setServerError(err.response.data.message);
+        } else {
+          setServerError('An error occurred while trying to sign in.');
+        }
+      }
     }
   };
 
@@ -87,6 +112,7 @@ function SignInForm({ onSubmit }) {
         />
         {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
         <SignInButton type="submit">Signin</SignInButton>
+        {serverError && <ErrorMessage>{serverError}</ErrorMessage>} {/* Display server error */}
       </form>
     </SignInFormContainer>
   );

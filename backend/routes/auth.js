@@ -1,12 +1,14 @@
-const express = require('express');
+import express from 'express';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js'; // Import the User model
+
 const router = express.Router();
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // Import the User model
 
 // Registration route
 router.post('/register', async (req, res) => {
     try {
+        console.log("Register Request Body:", req.body); // Log request body
         // Hash the password
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
@@ -30,20 +32,28 @@ router.post('/register', async (req, res) => {
 // Login route
 router.post('/login', async (req, res) => {
     try {
+        console.log("Login Request Body:", req.body); // Log request body
         // Find the user
         const user = await User.findOne({ username: req.body.username });
+        console.log("User Found:", user); // Log user found
+
         if (!user) {
+            console.log("User not found error");
             return res.status(400).json({ message: 'Cannot find user' });
         }
 
         // Compare passwords
         const passwordMatch = await bcrypt.compare(req.body.password, user.password);
+        console.log("Password Match:", passwordMatch); // Log password match result
+
         if (!passwordMatch) {
+            console.log("Incorrect password error");
             return res.status(400).json({ message: 'Incorrect password' });
         }
 
         // Create a JWT
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' }); // Replace 'YOUR_SECRET_KEY'
+        console.log("Generated Token:", token); // Log generated token
 
         // Send the token
         res.json({ token, message: 'Logged in successfully' });
@@ -53,4 +63,4 @@ router.post('/login', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

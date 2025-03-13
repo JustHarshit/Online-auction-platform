@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios'; // Import Axios for API calls
 
 const DashboardContainer = styled.div`
   width: 100vw;
@@ -80,8 +81,56 @@ const Footer = styled.div`
   margin-top: auto;
 `;
 
+const AuctionList = styled.ul`
+  list-style: none;
+  padding: 0;
+`;
+
+const AuctionItem = styled.li`
+  padding: 0.5em 0;
+  border-bottom: 1px solid #eee;
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
 function Dashboard() {
   const navigate = useNavigate();
+  const [auctions, setAuctions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Fetch auctions from the backend
+    const fetchAuctions = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        // Get the JWT token from localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No token found');
+        }
+
+        // Make a GET request to /auctions
+        const response = await axios.get('http://localhost:5001/auctions', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Set the auctions state
+        setAuctions(response.data);
+      } catch (err) {
+        // Handle errors (e.g., invalid token, network error)
+        setError(err.message || 'Failed to fetch auctions.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAuctions();
+  }, []);
 
   const handleClick = (path) => {
     console.log(`Navigating to: ${path}`);
@@ -107,7 +156,21 @@ function Dashboard() {
       <DashboardContent>
         <Section>
           <h3>Your Active Auctions</h3>
-          <p>No active auctions at the moment.</p>
+          {loading && <p>Loading auctions...</p>}
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          {!loading && !error && (
+            <AuctionList>
+              {auctions.length > 0 ? (
+                auctions.map((auction) => (
+                  <AuctionItem key={auction._id}>
+                    {auction.itemName} - Starting Bid: ${auction.startingBid}
+                  </AuctionItem>
+                ))
+              ) : (
+                <p>No active auctions at the moment.</p>
+              )}
+            </AuctionList>
+          )}
         </Section>
 
         <Section>

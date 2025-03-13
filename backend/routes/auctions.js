@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Auction = require('../models/Auction');
-const jwt = require('jsonwebtoken');
-const authMiddleware = require('../middleware/authMiddleware');
+//const jwt = require('jsonwebtoken');
+const authMiddleware = require('../middleware/authMiddleware').default;
 
 // GET all auctions
 router.get('/', async (req, res) => {
