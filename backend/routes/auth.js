@@ -1,3 +1,4 @@
+// routes/auth.js
 import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -10,7 +11,8 @@ router.post('/register', async (req, res) => {
     try {
         console.log("Register Request Body:", req.body); // Log request body
         // Hash the password
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        const saltRounds = 10;  // Define the number of salt rounds
+        const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
 
         // Create a new user
         const user = new User({
@@ -28,6 +30,7 @@ router.post('/register', async (req, res) => {
         res.status(500).json({ message: 'Registration failed', error: error.message });
     }
 });
+
 
 // Login route
 router.post('/login', async (req, res) => {

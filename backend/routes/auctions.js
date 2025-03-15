@@ -1,8 +1,11 @@
-const express = require('express');
+/* eslint-disable import/first */
+// routes/auctions.js
+import express from 'express';
 const router = express.Router();
-const Auction = require('../models/Auction');
-//const jwt = require('jsonwebtoken');
-const authMiddleware = require('../middleware/authMiddleware').default;
+// eslint-disable-next-line import/first
+import Auction from '../models/Auction.js';
+//import jwt from 'jsonwebtoken';  // You are not using this, so commented it out
+import authMiddleware from '../middleware/authMiddleware.js';
 
 // GET all auctions
 router.get('/', async (req, res) => {
@@ -54,4 +57,4 @@ async function getAuction(req, res, next) {
     next();
 }
 
-module.exports = router;
+export default router;

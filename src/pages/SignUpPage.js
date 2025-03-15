@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';  // Import Axios
 
 const SignUpContainer = styled.div`
   width: 100vw;
@@ -115,8 +116,9 @@ function SignUp() {
   const [nameError, setNameError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [generalError, setGeneralError] = useState('');  // New state for general errors
 
-  const validEmailDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'aol.com', 'hotmail.com']; // adding valid email address
+  const validEmailDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'aol.com', 'hotmail.com'];
 
   const isValidEmail = (email) => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -134,12 +136,13 @@ function SignUp() {
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {  // Make handleSubmit async
     e.preventDefault();
 
     setNameError('');
     setEmailError('');
     setPasswordError('');
+    setGeneralError('');  // Clear any previous general errors
 
     let isValid = true;
     if (!name) {
@@ -164,11 +167,20 @@ function SignUp() {
     }
 
     if (isValid) {
-      localStorage.setItem('username', name); // storing username because we dont have name field on signin page.
-      localStorage.setItem('password', password);
+      try {
+        const response = await axios.post('http://localhost:5001/auth/register', {
+          username: email,  // Use email as username to match backend
+          password: password
+        });
 
-      console.log("Signing up with:", name, email, password);
-      navigate('/signin'); // After sign up go to sign in page
+        console.log("Registration successful:", response.data);
+        localStorage.setItem('username', name);  // Store username
+        localStorage.setItem('password', password);
+        navigate('/signin');  // Redirect to sign-in
+      } catch (error) {
+        console.error("Registration failed:", error.response ? error.response.data : error.message);
+        setGeneralError(error.response?.data?.message || 'Registration failed');  // Set a general error
+      }
     }
   };
 
@@ -223,6 +235,7 @@ function SignUp() {
           />
           {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
           <SignUpButton type="submit">Sign Up</SignUpButton>
+          {generalError && <ErrorMessage>{generalError}</ErrorMessage>}  {/* Display general error */}
         </form>
       </SignUpSection>
 
