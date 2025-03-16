@@ -148,6 +148,9 @@ function SignUp() {
     if (!name) {
       setNameError('Name is required');
       isValid = false;
+    } else if (name.length < 3) {
+        setNameError('Name must be at least 3 characters');
+        isValid = false;
     }
     if (!email) {
       setEmailError('Email is required');

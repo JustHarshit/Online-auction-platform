@@ -14,7 +14,6 @@ const SignInContainer = styled.div`
   font-size: 16px;
 `;
 
-
 const Header = styled.div`
   background: linear-gradient(to right, #6a00ff, #8e2de2);
   color: white;
@@ -110,11 +109,38 @@ function SignIn() {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+    const [usernameError, setUsernameError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoginError('');
     setIsLoading(true);
+      setUsernameError('');
+      setPasswordError('');
+
+    // Input Validation
+      let isValid = true;
+      if (!username) {
+          setUsernameError('Username is required');
+          isValid = false;
+      } else if (username.length < 3) {
+          setUsernameError('Username must be at least 3 characters');
+          isValid = false;
+      }
+
+      if (!password) {
+          setPasswordError('Password is required');
+          isValid = false;
+      } else if (password.length < 6) {
+          setPasswordError('Password must be at least 6 characters');
+          isValid = false;
+      }
+
+      if (!isValid) {
+          setIsLoading(false);
+          return;
+      }
 
     try {
       // Send a POST request to /auth/login
@@ -165,12 +191,14 @@ function SignIn() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
+            {usernameError && <ErrorMessage>{usernameError}</ErrorMessage>}
           <InputField
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+            {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
           {loginError && <ErrorMessage>{loginError}</ErrorMessage>}
           <SignInButton type="submit" disabled={isLoading}>
             {isLoading ? 'Signing In...' : 'Signin'}

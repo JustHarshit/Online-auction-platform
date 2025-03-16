@@ -112,6 +112,12 @@ const ErrorMessage = styled.div`
   margin-top: 0.3125em;
 `;
 
+const Instructions = styled.p`
+  font-size: 0.9em;
+  margin-bottom: 1em;
+  text-align: left;
+`;
+
 function PostAuction() {
   const navigate = useNavigate();
   const [itemName, setItemName] = useState('');
@@ -122,7 +128,7 @@ function PostAuction() {
   const [startingBidError, setStartingBidError] = useState('');
   const [message, setMessage] = useState('');
   const [generalError, setGeneralError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -130,24 +136,39 @@ function PostAuction() {
     setDescriptionError('');
     setStartingBidError('');
     setMessage('');
-    setGeneralError('');
-    setIsLoading(true);
+      setGeneralError('');
+    setIsLoading(true);  // Set loading to true at the start
 
     let isValid = true;
+
+    // Item Name Validation
     if (!itemName) {
       setItemNameError('Item name is required');
       isValid = false;
+    } else if (itemName.length < 3) {
+      setItemNameError('Item name must be at least 3 characters');
+      isValid = false;
     }
+
+    // Description Validation
     if (!description) {
       setDescriptionError('Description is required');
       isValid = false;
+    } else if (description.length < 10) {
+      setDescriptionError('Description must be at least 10 characters');
+      isValid = false;
     }
+
+    // Starting Bid Validation
     if (!startingBid) {
       setStartingBidError('Starting bid is required');
       isValid = false;
     } else if (isNaN(startingBid) || parseFloat(startingBid) <= 0) {
       setStartingBidError('Starting bid must be a positive number');
       isValid = false;
+    } else if (parseFloat(startingBid) <= 100) {
+        setStartingBidError('Starting bid must be more than 100');
+        isValid = false;
     }
 
     if (isValid) {
@@ -186,11 +207,13 @@ function PostAuction() {
         setMessage(
           'Error creating auction: ' + (error.response?.data?.message || error.message)
         );
-        setGeneralError(error.response?.data?.message || 'An unexpected error occurred.');
-        console.error(error);
+          setGeneralError(error.response?.data?.message || 'An unexpected error occurred.');
+          console.error(error);
       } finally {
-        setIsLoading(false);
+          setIsLoading(false);
       }
+    } else {
+        setIsLoading(false);  // Reset loading state if validation fails
     }
   };
 
@@ -212,6 +235,16 @@ function PostAuction() {
 
       <PostAuctionSection>
         <h2>Post an Auction</h2>
+
+        <Instructions>
+          Please fill out the following information to create your auction listing:
+          <ul>
+            <li><b>Item Name:</b> Enter a descriptive name for your item (at least 3 characters).</li>
+            <li><b>Description:</b> Provide detailed information about the item (at least 10 characters).</li>
+            <li><b>Starting Bid:</b> Set a starting bid amount greater than 100.</li>
+          </ul>
+        </Instructions>
+
         <form onSubmit={handleSubmit}>
           <InputField
             type="text"
@@ -241,7 +274,7 @@ function PostAuction() {
             {isLoading ? 'Posting Auction...' : 'Post Auction'}
           </PostAuctionButton>
           {message && <p>{message}</p>}
-          {generalError && <ErrorMessage>{generalError}</ErrorMessage>}
+            {generalError && <ErrorMessage>{generalError}</ErrorMessage>}
         </form>
       </PostAuctionSection>
 
