@@ -121,6 +121,8 @@ function PostAuction() {
   const [descriptionError, setDescriptionError] = useState('');
   const [startingBidError, setStartingBidError] = useState('');
   const [message, setMessage] = useState('');
+  const [generalError, setGeneralError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -128,6 +130,8 @@ function PostAuction() {
     setDescriptionError('');
     setStartingBidError('');
     setMessage('');
+    setGeneralError('');
+    setIsLoading(true);
 
     let isValid = true;
     if (!itemName) {
@@ -155,7 +159,7 @@ function PostAuction() {
         }
 
         // Make a POST request to /auctions with JWT token
-        /*const response = */await axios.post(
+        await axios.post(
           'http://localhost:5001/auctions',
           {
             itemName,
@@ -170,6 +174,7 @@ function PostAuction() {
         );
 
         setMessage('Auction created successfully!');
+
         // Reset form
         setItemName('');
         setDescription('');
@@ -181,7 +186,10 @@ function PostAuction() {
         setMessage(
           'Error creating auction: ' + (error.response?.data?.message || error.message)
         );
+        setGeneralError(error.response?.data?.message || 'An unexpected error occurred.');
         console.error(error);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -229,8 +237,11 @@ function PostAuction() {
           />
           {startingBidError && <ErrorMessage>{startingBidError}</ErrorMessage>}
 
-          <PostAuctionButton type="submit">Post Auction</PostAuctionButton>
+          <PostAuctionButton type="submit" disabled={isLoading}>
+            {isLoading ? 'Posting Auction...' : 'Post Auction'}
+          </PostAuctionButton>
           {message && <p>{message}</p>}
+          {generalError && <ErrorMessage>{generalError}</ErrorMessage>}
         </form>
       </PostAuctionSection>
 

@@ -14,6 +14,7 @@ const SignInContainer = styled.div`
   font-size: 16px;
 `;
 
+
 const Header = styled.div`
   background: linear-gradient(to right, #6a00ff, #8e2de2);
   color: white;
