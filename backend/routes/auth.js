@@ -1,8 +1,8 @@
-// routes/auth.js
 import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import User from '../models/User.js'; // Import the User model
+import User from '../models/User.js'; 
+import loginLimiter from '../middleware/rateLimiter.js'; 
 
 const router = express.Router();
 
@@ -33,7 +33,7 @@ router.post('/register', async (req, res) => {
 
 
 // Login route
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
     try {
         console.log("Login Request Body:", req.body); // Log request body
         // Find the user
