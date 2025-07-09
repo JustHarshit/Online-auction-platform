@@ -13,7 +13,7 @@ router.post('/register', [
     body('username').isString().trim().escape(),
     body('password').isLength({ min: 8 })
     ], 
-    async (req, res) => {
+    async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
@@ -37,13 +37,13 @@ router.post('/register', [
         res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
         console.error('Registration error:', error);
-        res.status(500).json({ message: 'Registration failed', error: error.message });
+        return next(error);
     }
 });
 
 
 // Login route
-router.post('/login', loginLimiter, async (req, res) => {
+router.post('/login', loginLimiter, async (req, res, next) => {
     try {
         console.log("Login Request Body:", req.body); // Log request body
         // Find the user
@@ -52,7 +52,9 @@ router.post('/login', loginLimiter, async (req, res) => {
 
         if (!user) {
             console.log("User not found error");
-            return res.status(400).json({ message: 'Cannot find user' });
+            const error = new Error('User not found');
+            error.status = 400;
+            return next(error);
         }
 
         // Compare passwords
@@ -61,7 +63,9 @@ router.post('/login', loginLimiter, async (req, res) => {
 
         if (!passwordMatch) {
             console.log("Incorrect password error");
-            return res.status(400).json({ message: 'Incorrect password' });
+            const error = new Error('Incorrect password');
+            error.status = 400;
+            return next(error);
         }
 
         // Create a JWT
@@ -72,7 +76,7 @@ router.post('/login', loginLimiter, async (req, res) => {
         res.json({ token, message: 'Logged in successfully' });
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({ message: 'Login failed', error: error.message });
+        return next(error);
     }
 });
 

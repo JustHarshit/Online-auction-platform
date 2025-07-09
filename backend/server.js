@@ -6,6 +6,8 @@ import mongoose from 'mongoose';
 import authRoutes from './routes/auth.js';
 import auctionRoutes from './routes/auctions.js';
 import helmet from 'helmet';
+import errorHandler from './middleware/errorHandler.js';
+import morgan from 'morgan';
 
 app.use(helmet());
 dotenv.config(); 
@@ -23,6 +25,8 @@ app.use(express.json());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/auctions', auctionRoutes);
+app.use(errorHandler); // Error handling middleware
+app.use(morgan('dev')); // Logging middleware
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)

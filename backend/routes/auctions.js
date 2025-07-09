@@ -8,12 +8,12 @@ import Auction from '../models/Auction.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 
 // GET all auctions
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try {
         const auctions = await Auction.find();
         res.json(auctions);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        next(err); // Pass the error to the error handling middleware
     }
 });
 
@@ -23,7 +23,7 @@ router.get('/:id', getAuction, (req, res) => {
 });
 
 // POST create an auction (protected route, requires authentication)
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, async (req, res, next) => {
     const auction = new Auction({
         itemName: req.body.itemName,
         description: req.body.description,
@@ -37,7 +37,7 @@ router.post('/', authMiddleware, async (req, res) => {
         const newAuction = await auction.save();
         res.status(201).json({ message: 'Auction created successfully', auction: newAuction });
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        return next(err); // Pass the error to the error handling middleware
     }
 });
 
@@ -47,10 +47,12 @@ async function getAuction(req, res, next) {
     try {
         auction = await Auction.findById(req.params.id);
         if (auction == null) {
-            return res.status(404).json({ message: 'Cannot find auction' });
+            const error = new Error('Cannot find auction');
+            error.status = 404;
+            return next(error);
         }
     } catch (err) {
-        return res.status(500).json({ message: err.message });
+        return next(err);
     }
 
     res.auction = auction;
