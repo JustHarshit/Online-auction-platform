@@ -9,15 +9,15 @@ import helmet from 'helmet';
 import errorHandler from './middleware/errorHandler.js';
 import morgan from 'morgan';
 
-app.use(helmet());
 dotenv.config(); 
 
 const app = express();
 const port = process.env.PORT || 5001;
 
 // Middleware and CORS setup
+app.use(helmet());
 app.use(cors({
-  origin: 'http://localhost:3000', // React's default dev server
+  origin: 'http://localhost:3001', // React's default dev server
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
 app.use(express.json());

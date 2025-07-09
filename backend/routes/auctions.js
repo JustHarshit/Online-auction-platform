@@ -10,7 +10,7 @@ import authMiddleware from '../middleware/authMiddleware.js';
 // GET all auctions
 router.get('/', async (req, res, next) => {
     try {
-        const auctions = await Auction.find();
+        const auctions = await Auction.find().populate('seller', 'username'); // Populate seller field with username
         res.json(auctions);
     } catch (err) {
         next(err); // Pass the error to the error handling middleware
@@ -45,7 +45,7 @@ router.post('/', authMiddleware, async (req, res, next) => {
 async function getAuction(req, res, next) {
     let auction;
     try {
-        auction = await Auction.findById(req.params.id);
+        auction = await Auction.findById(req.params.id).populate('seller', 'username'); // Populate seller field with username
         if (auction == null) {
             const error = new Error('Cannot find auction');
             error.status = 404;
