@@ -1,4 +1,3 @@
-// models/Auction.js
 import mongoose from 'mongoose';
 
 const auctionSchema = new mongoose.Schema({
@@ -21,7 +20,13 @@ const auctionSchema = new mongoose.Schema({
     highestBidder: {
         type: String,
         default: null
+    },
+    seller: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
+
 });
 
 const Auction = mongoose.model('Auction', auctionSchema);

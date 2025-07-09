@@ -2,12 +2,22 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js'; 
-import loginLimiter from '../middleware/rateLimiter.js'; 
+import loginLimiter from '../middleware/rateLimiter.js';
+import { body, validationResult } from 'express-validator';
+
 
 const router = express.Router();
 
 // Registration route
-router.post('/register', async (req, res) => {
+router.post('/register', [
+    body('username').isString().trim().escape(),
+    body('password').isLength({ min: 8 })
+    ], 
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     try {
         console.log("Register Request Body:", req.body); // Log request body
         // Hash the password
