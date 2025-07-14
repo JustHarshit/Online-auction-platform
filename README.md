@@ -1,70 +1,208 @@
-# Getting Started with Create React App
+# Online Auction Platform
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a full-stack online auction platform built with React (frontend), Express and Node.js (backend), and MongoDB (database).
 
-## Available Scripts
+---
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Directory Structure](#directory-structure)
+- [Setup & Installation](#setup--installation)
+- [Running the App](#running-the-app)
+- [API Documentation](#api-documentation)
+- [Development Scripts](#development-scripts)
+- [Additional Resources](#additional-resources)
+
+---
+
+## Project Overview
+
+This application allows users to register, log in, create auctions, and view auction items. It features secure authentication, input validation, rate limiting, and user-auction relationships.
+
+---
+
+## Features
+
+- User registration and login with JWT authentication
+- Secure password hashing
+- Rate limiting on login
+- Create, view, and fetch auction items
+- Seller-user relationship for auctions
+- Input validation and security headers
+- Centralized error handling and logging
+- Modern React frontend
+
+---
+
+## Directory Structure
+```
+justharshit-online-auction-platform/
+├── backend/
+│ ├── middleware/
+│ ├── models/
+│ ├── routes/
+│ ├── server.js
+│ └── ...
+├── public/
+├── src/
+│ ├── components/
+│ ├── pages/
+│ └── ...
+├── package.json
+├── README.md
+└── ...
+```
+
+---
+
+## Setup & Installation
+
+### Prerequisites
+
+- Node.js (v18+ recommended)
+- MongoDB (local or Atlas)
+
+### 1. Clone the Repository
+
+`git clone <your-repo-url>`  
+`cd justharshit-online-auction-platform`
+
+
+### 2. Backend Setup
+
+`cd backend`  
+`npm install`
+
+
+Create a `.env` file in the `backend` directory with the following content:
+
+PORT=5001
+MONGODB_URI=mongodb://localhost:27017/auction-db
+JWT_SECRET=your_super_secret_key
+
+
+Start the backend server:
+
+`npm start`
+
+### 3. Frontend Setup
+
+`cd ..`  
+`npm install`  
+`npm start`
+
+- The React app runs on [http://localhost:3000](http://localhost:3000)
+- The backend runs on [http://localhost:5001](http://localhost:5001)
+
+---
+
+## Running the App
+
+- Register a user via the frontend or `POST /auth/register`
+- Log in to receive a JWT token
+- Use the token to create auctions or access protected routes
+- View all auctions or a single auction via the frontend or API
+
+---
+
+## API Documentation
+
+### Auth
+
+#### Register
+
+- **POST** `/auth/register`
+- **Body:**
+{
+"username": "yourname",
+"password": "yourpassword"
+}
+
+
+- **Response:**  
+`201 Created`  
+`{ "message": "User created successfully" }`
+
+#### Login
+
+- **POST** `/auth/login`
+- **Body:**
+{
+"username": "yourname",
+"password": "yourpassword"
+}
+
+
+- **Response:**  
+`200 OK`  
+`{ "token": "JWT_TOKEN", "message": "Logged in successfully" }`
+
+---
+
+### Auctions
+
+#### Get All Auctions
+
+- **GET** `/auctions`
+- **Response:**  
+`200 OK`  
+[
+{
+"_id": "...",
+"itemName": "Item",
+"description": "Desc",
+"startingBid": 100,
+"currentBid": 150,
+"seller": { "_id": "...", "username": "sellername" }
+}
+]
+
+#### Get Single Auction
+
+- **GET** `/auctions/:id`
+- **Response:**  
+`200 OK`  
+Auction object
+
+#### Create Auction
+
+- **POST** `/auctions`
+- **Headers:**  
+`Authorization: Bearer <JWT_TOKEN>`
+- **Body:**
+{
+"itemName": "Item",
+"description": "Desc",
+"startingBid": 100
+}
+
+- **Response:**  
+`201 Created`  
+`{ "message": "Auction created successfully", "auction": { ... } }`
+
+---
+
+## Development Scripts
 
 In the project directory, you can run:
 
-### `npm start`
+- `npm start` — Runs the app in development mode.
+- `npm test` — Launches the test runner in interactive watch mode.
+- `npm run build` — Builds the app for production.
+- `npm run eject` — Ejects the Create React App configuration (irreversible).
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Additional Resources
 
-### `npm test`
+- [Create React App Documentation](https://facebook.github.io/create-react-app/docs/getting-started)
+- [React Documentation](https://reactjs.org/)
+- [Express Documentation](https://expressjs.com/)
+- [MongoDB Documentation](https://docs.mongodb.com/)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+**Note:**  
+This is a private project. For questions, contact the project owner.
