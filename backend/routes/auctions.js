@@ -59,4 +59,56 @@ async function getAuction(req, res, next) {
     next();
 }
 
+// Place a bid on an auction
+router.post('/:id/bid', authMiddleware, async (req, res, next) => {
+    const bidAmount = req.body.bidAmount;
+    try {
+        // Validate bidAmount
+        if (typeof bidAmount !== 'number' || bidAmount <= 0) {
+            const error = new Error('Bid amount must be a positive number.');
+            error.status = 400;
+            return next(error);
+        }
+
+        // Find auction
+        const auction = await Auction.findById(req.params.id);
+        if (!auction) {
+            const error = new Error('Auction not found.');
+            error.status = 404;
+            return next(error);
+        }
+
+        // Check if bid is higher than currentBid
+        if (bidAmount <= auction.currentBid) {
+            const error = new Error('Bid must be higher than the current bid.');
+            error.status = 400;
+            return next(error);
+        }
+
+        if (auction.seller.equals(req.user._id)) {
+            const error = new Error('Sellers cannot bid on their own auctions.');
+            error.status = 403;
+            return next(error);
+        }
+
+
+        // Update auction
+        auction.currentBid = bidAmount;
+        auction.highestBidder = req.user._id;
+
+        // Optional: add to bid history
+        // auction.bids.push({ bidder: req.user._id, amount: bidAmount });
+
+        await auction.save();
+
+        res.status(200).json({
+            message: 'Bid placed successfully.',
+            auction
+        });
+    } catch (err) {
+        next(err);
+    }
+});
+
+
 export default router;

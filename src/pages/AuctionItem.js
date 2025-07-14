@@ -113,7 +113,7 @@ function AuctionItem() {
         const res = await axios.get(`http://localhost:5001/auctions/${id}`);
         setItem(res.data);
       } catch (error) {
-        setMessage('Error fetching auction item: ' + error.response?.data?.message || error.message);
+        setMessage('Error fetching auction item: ' + (error.response?.data?.message || error.message));
         console.error(error);
       }
     };
@@ -121,7 +121,7 @@ function AuctionItem() {
     fetchItem();
   }, [id]);
 
-  const handleBid = async () => {
+  const placeBid = async () => {
     const username = prompt('Enter your username to place a bid:');
 
     if (!username) {
@@ -129,19 +129,19 @@ function AuctionItem() {
       return;
     }
 
-    if (bid <= item.currentBid) {
+    if (Number(bid) <= item.currentBid) {
       setMessage('Bid must be higher than the current bid.');
       return;
     }
 
     try {
-      const res = await axios.post(`http://localhost:5001/bid/${id}`, { bid, username });
+      const res = await axios.post(`http://localhost:5001/bid/${id}`, { bid: Number(bid), username });
       setMessage(res.data.message);
       if (res.data.winner) {
         setMessage(`Auction closed. Winner: ${res.data.winner}`);
       }
     } catch (error) {
-      setMessage('Error placing bid.');
+      setMessage(error.response?.data?.message || 'Error placing bid.');
       console.error(error);
     }
   };
@@ -167,13 +167,17 @@ function AuctionItem() {
         <p>{item.description}</p>
         <p>Current Bid: ${item.currentBid}</p>
         <p>Highest Bidder: {item.highestBidder || 'No bids yet'}</p>
-        <InputField
-          type="number"
-          value={bid}
-          onChange={(e) => setBid(e.target.value)}
-          placeholder="Enter your bid"
-        />
-        <BidButton onClick={handleBid}>Place Bid</BidButton>
+        <div>
+          <InputField
+            type="number"
+            value={bid}
+            onChange={(e) => setBid(e.target.value)}
+            placeholder="Enter your bid"
+          />
+          <BidButton onClick={placeBid}>Place Bid</BidButton>
+          {message && <p>{message}</p>}
+        </div>
+
         {message && <Message className="message">{message}</Message>}
       </ItemSection>
 
