@@ -106,6 +106,8 @@ function AuctionItem() {
   const [bid, setBid] = useState(0);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  // Removed duplicate AuctionItem component and its inner placeBid function to resolve redeclaration error.
+
 
   useEffect(() => {
     const fetchItem = async () => {
