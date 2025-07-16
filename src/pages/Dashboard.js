@@ -1,195 +1,122 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Import Axios for API calls
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import './Dashboard.css'; // You'll need to create this file
 
-const DashboardContainer = styled.div`
-  width: 100vw;
-  height: 100vh;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: #f8f8f8;
-  font-size: 16px;
-`;
-
-const Header = styled.div`
-  background: linear-gradient(to right, #6a00ff, #8e2de2);
-  color: white;
-  text-align: center;
-  padding: 1.25em 0;
-  width: 100%;
-  font-size: 1.2em;
-  box-shadow: 0px 0.25em 0.375em rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-`;
-
-const NavLink = styled(Link)`
-  color: white;
-  text-decoration: none;
-  padding: 0.5em 1em;
-  border-radius: 0.3125em;
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
-`;
-
-const ClickableDiv = styled.div`
-  color: white;
-  text-decoration: none;
-  padding: 0.5em 1em;
-  border-radius: 0.3125em;
-  cursor: pointer;
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
-`;
-
-const WelcomeSection = styled.div`
-  text-align: center;
-  padding: 1.25em;
-  margin-bottom: 1.25em;
-`;
-
-const DashboardContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 80%;
-  max-width: 50em;
-`;
-
-const Section = styled.div`
-  background-color: white;
-  border-radius: 0.5em;
-  box-shadow: 0px 0.125em 0.25em rgba(0, 0, 0, 0.1);
-  padding: 1.25em;
-  margin-bottom: 1.25em;
-  width: 100%;
-  text-align: left;
-`;
-
-const Footer = styled.div`
-  text-align: center;
-  padding: 0.625em;
-  background-color: white;
-  width: 100%;
-  font-size: 0.8em;
-  margin-top: auto;
-`;
-
-const AuctionList = styled.ul`
-  list-style: none;
-  padding: 0;
-`;
-
-const AuctionItem = styled.li`
-  padding: 0.5em 0;
-  border-bottom: 1px solid #eee;
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-function Dashboard() {
-  const navigate = useNavigate();
-  const [auctions, setAuctions] = useState([]);
+const Dashboard = () => {
+  const [user, setUser] = useState({});
+  const [myAuctions, setMyAuctions] = useState([]);
+  const [myBids, setMyBids] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Fetch auctions from the backend
-    const fetchAuctions = async () => {
-      setLoading(true);
-      setError('');
+    const fetchUserData = async () => {
       try {
-        // Get the JWT token from localStorage
+        setLoading(true);
+        // Get user data from localStorage
+        const userData = JSON.parse(localStorage.getItem('user'));
         const token = localStorage.getItem('token');
-        if (!token) {
-          throw new Error('No token found');
+        
+        if (!userData || !token) {
+          throw new Error('User not logged in');
         }
-
-        // Make a GET request to /auctions
-        const response = await axios.get('http://localhost:5001/auctions', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        
+        setUser(userData);
+        
+        // Fetch auctions (we'll filter for user's own auctions)
+        const auctionsResponse = await axios.get('http://localhost:5001/auctions', {
+          headers: { Authorization: `Bearer ${token}` }
         });
-
-        // Set the auctions state
-        setAuctions(response.data);
+        
+        // Filter for auctions created by this user
+        const userAuctions = auctionsResponse.data.filter(
+          auction => auction.seller._id === userData._id
+        );
+        setMyAuctions(userAuctions);
+        
+        // For bids, you would need a backend endpoint that returns auctions a user has bid on
+        // This is a placeholder - you'll need to implement the endpoint
+        // const bidsResponse = await axios.get('http://localhost:5001/auctions/mybids', {
+        //   headers: { Authorization: `Bearer ${token}` }
+        // });
+        // setMyBids(bidsResponse.data);
+        
+        // For now, let's just set an empty array
+        setMyBids([]);
+        
       } catch (err) {
-        // Handle errors (e.g., invalid token, network error)
-        setError(err.message || 'Failed to fetch auctions.');
+        console.error('Error fetching dashboard data:', err);
+        setError('Failed to load dashboard data. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAuctions();
+    fetchUserData();
   }, []);
 
-  const handleClick = (path) => {
-    console.log(`Navigating to: ${path}`);
-    navigate(path);
-  };
+  if (loading) return <div className="dashboard-loading">Loading dashboard...</div>;
+  if (error) return <div className="dashboard-error">{error}</div>;
 
   return (
-    <DashboardContainer>
-      <Header>
-        <ClickableDiv onClick={() => handleClick('/')}>Auction App</ClickableDiv>
-        <NavLink to="/signup">Signup</NavLink>
-        <NavLink to="/signin">Signin</NavLink>
-        <ClickableDiv onClick={() => handleClick('/dashboard')}>Dashboard</ClickableDiv>
-        <NavLink to="/postauction">Post Auction</NavLink>
-        <NavLink to="/auctionitem">Auction Items</NavLink>
-      </Header>
-
-      <WelcomeSection>
-        <h2>Welcome to Your Dashboard!</h2>
-        <p>Here you can manage your auctions, view your bids, and more.</p>
-      </WelcomeSection>
-
-      <DashboardContent>
-        <Section>
-          <h3>Your Active Auctions</h3>
-          {loading && <p>Loading auctions...</p>}
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-          {!loading && !error && (
-            <AuctionList>
-              {auctions.length > 0 ? (
-                auctions.map((auction) => (
-                  <AuctionItem key={auction._id}>
-                    {auction.itemName} - Starting Bid: ${auction.startingBid}
-                  </AuctionItem>
-                ))
-              ) : (
-                <p>No active auctions at the moment.</p>
-              )}
-            </AuctionList>
-          )}
-        </Section>
-
-        <Section>
-          <h3>Your Bids</h3>
-          <p>No current bids.</p>
-        </Section>
-
-        <Section>
-          <h3>Account Settings</h3>
-          <p>Manage your profile and preferences.</p>
-        </Section>
-      </DashboardContent>
-
-      <Footer>
-        &copy; 2024 Auction App. All rights reserved.<br />
-        Welcome to the best place to buy and sell items through auctions!
-      </Footer>
-    </DashboardContainer>
+    <div className="dashboard-container">
+      <section className="dashboard-welcome">
+        <h1>Welcome, {user.username}!</h1>
+        <p>Here's an overview of your auction activity</p>
+      </section>
+      
+      <div className="dashboard-stats">
+        <div className="stat-card">
+          <h3>My Auctions</h3>
+          <p className="stat-number">{myAuctions.length}</p>
+        </div>
+        <div className="stat-card">
+          <h3>Active Bids</h3>
+          <p className="stat-number">{myBids.length}</p>
+        </div>
+        {/* Add more stat cards as needed */}
+      </div>
+      
+      <section className="dashboard-my-auctions">
+        <h2>My Auctions</h2>
+        {myAuctions.length === 0 ? (
+          <p className="empty-state">You haven't created any auctions yet.</p>
+        ) : (
+          <ul className="auctions-list">
+            {myAuctions.map(auction => (
+              <li key={auction._id} className="auction-item">
+                <h3>{auction.itemName}</h3>
+                <p className="auction-desc">{auction.description}</p>
+                <div className="auction-bid-info">
+                  <p>Starting bid: ${auction.startingBid}</p>
+                  <p>Current bid: ${auction.currentBid || auction.startingBid}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+      
+      <section className="dashboard-my-bids">
+        <h2>My Bids</h2>
+        {myBids.length === 0 ? (
+          <p className="empty-state">You haven't placed any bids yet.</p>
+        ) : (
+          <ul className="bids-list">
+            {myBids.map(bid => (
+              <li key={bid._id} className="bid-item">
+                <h3>{bid.auction.itemName}</h3>
+                <p>Your bid: ${bid.amount}</p>
+                <p className="bid-status">
+                  Status: {bid.isHighestBid ? 'Highest Bid' : 'Outbid'}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
   );
-}
+};
 
 export default Dashboard;

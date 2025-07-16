@@ -1,0 +1,125 @@
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.dashboard-welcome {
+  margin-bottom: 2rem;
+}
+
+.dashboard-welcome h1 {
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-welcome p {
+  color: #7f8c8d;
+  font-size: 1.1rem;
+}
+
+.dashboard-stats {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  flex: 1;
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card h3 {
+  margin-top: 0;
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1976d2;
+  margin: 0.5rem 0 0 0;
+}
+
+.dashboard-my-auctions, .dashboard-my-bids {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-my-auctions h2, .dashboard-my-bids h2 {
+  margin-top: 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+.empty-state {
+  color: #7f8c8d;
+  font-style: italic;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.auctions-list, .bids-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.auction-item, .bid-item {
+  border-bottom: 1px solid #ecf0f1;
+  padding: 1rem 0;
+}
+
+.auction-item:last-child, .bid-item:last-child {
+  border-bottom: none;
+}
+
+.auction-item h3, .bid-item h3 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+}
+
+.auction-desc {
+  color: #7f8c8d;
+  margin: 0.5rem 0;
+}
+
+.auction-bid-info {
+  display: flex;
+  justify-content: space-between;
+  color: #3498db;
+  margin-top: 0.5rem;
+}
+
+.bid-status {
+  font-weight: bold;
+  color: #27ae60;
+}
+
+.bid-status.outbid {
+  color: #e74c3c;
+}
+
+.dashboard-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #7f8c8d;
+}
+
+.dashboard-error {
+  text-align: center;
+  padding: 2rem;
+  color: #e74c3c;
+  background-color: #fadbd8;
+  border-radius: 8px;
+}
