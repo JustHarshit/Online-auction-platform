@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js'; 
 import loginLimiter from '../middleware/rateLimiter.js';
 import { body, validationResult } from 'express-validator';
+import authMiddleware from '../middleware/authMiddleware.js';
+
 
 
 const router = express.Router();
@@ -27,6 +29,7 @@ router.post('/register', [
         // Create a new user
         const user = new User({
             username: req.body.username,
+            name: req.body.name || '', // add this line if name comes from frontend
             password: hashedPassword,
         });
 
@@ -41,6 +44,40 @@ router.post('/register', [
     }
 });
 
+// Route to get logged-in user profile
+router.get('/me', authMiddleware, async (req, res) => {
+  res.json({
+    _id: req.user._id,
+    username: req.user.username,
+    name: req.user.name || '',
+  });
+});
+
+// Route to update logged-in user profile (name and password)
+router.put('/me', authMiddleware, async (req, res, next) => {
+  try {
+    if (req.body.name !== undefined) {
+      req.user.name = req.body.name;
+    }
+    if (req.body.password) {
+      if (req.body.password.length < 8) {
+        return res.status(400).json({ message: 'Password must be at least 8 characters long.' });
+      }
+      req.user.password = await bcrypt.hash(req.body.password, 10);
+    }
+    await req.user.save();
+    res.json({
+      message: 'Profile updated',
+      user: {
+        _id: req.user._id,
+        username: req.user.username,
+        name: req.user.name,
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 
 // Login route
 router.post('/login', loginLimiter, async (req, res, next) => {
