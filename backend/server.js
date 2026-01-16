@@ -10,6 +10,11 @@ import errorHandler from './middleware/errorHandler.js';
 import fs from 'fs';
 import path from 'path';
 import morgan from 'morgan';
+// backend/server.js
+import app, { connectToDatabase } from './app.js';
+const port = process.env.PORT || 5001;
+connectToDatabase().catch(err => console.error(err));
+app.listen(port, () => console.log(`Server listening on ${port}`));
 
 
 dotenv.config(); 
